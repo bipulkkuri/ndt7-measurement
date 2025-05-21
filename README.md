@@ -18,7 +18,25 @@ docker-compose up
 
 ## To Run
 ```
-python3 ndt7_test.py   
+python3 ndt7_test.py --local    
+```
+
+# Sample output
+```
+Starting NDT7 tests ...
+
+Server: localhost:4443
+Client: 192.168.1.9
+
+Download Started
+Download: 2672.52 Mb/s 
+Download: Complete
+Upload Started
+Upload: 2796.75 Mb/s 
+Upload Completed
+
+Finshed NDT7 tests
+
 ```
 
 ## Extending 

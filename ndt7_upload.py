@@ -6,8 +6,10 @@ import configparser
 import ssl
 from time import time
 import logging
+import argparse
 
 from ndt7_discover import discoverServerURLs
+from utils import getserverdetails,displaysc
 
 #logging.basicConfig(level=logging.DEBUG)
 config = configparser.ConfigParser()
@@ -40,13 +42,14 @@ async def uploader(websocket, data, start, end):
         if t >= previous + client_measurement_interval * 1000:
             elapsed_time = (getnow() - start) / 1000
             mean_mbps = total * 8 / 1_000_000 / elapsed_time
-            print(f"\rUpload: {mean_mbps:.2f} Mb/s", end='', flush=True)
+            #print(f"\rUpload: {mean_mbps:.2f} Mb/s{' ' * 22}", end='', flush=True)
+            print(f"\rUpload: {mean_mbps:.2f} Mb/s", end=' ', flush=True)
             previous = t
 
         await asyncio.sleep(0.001)  # Yield control to the event loop
 
 async def on_open(websocket):
-    #print("\nUpload Started")
+    print("Upload Started",flush=True)
     initial_message_size = 8192
     data = bytearray(initial_message_size)
     duration = 10000  # ms
@@ -55,8 +58,8 @@ async def on_open(websocket):
     await uploader(websocket, data, start, end)
 
 async def on_close(websocket, reason=None):
-    #print("\nUpload Completed")
-     print("\n")
+    print("\nUpload Completed")
+
 
 async def on_error(e):
     print("An error occurred:", str(e))
@@ -64,8 +67,8 @@ async def on_error(e):
 async def on_message(websocket):
     pass  # Handle incoming messages if necessary
 
-async def upload_test(serverconfig):
-    uri = config.get('mlab', 'upload_url')
+async def upload_test(uri):
+    #uri = config.get('mlab', 'upload_url')
     #urls=serverconfig.get('urls')
     #uri=urls.get('wss_download')
     subprotocol = config.get('mlab', 'subprotocols')
@@ -92,13 +95,6 @@ async def upload_test(serverconfig):
             await on_close(websocket, reason="Finished or error occurred")
 
 if __name__ == "__main__":
-    file_path = config.get('mlab', 'ndt_server_config')
-    if os.path.exists(file_path):
-        print(f"{file_path} already exists. Skipping API call.")
-        with open(file_path, "r") as f:
-            serverconfig = json.load(f)
-    else:
-        #serverconfig = discoverServerURLs()
-        serverconfig=""
-
-    asyncio.run(upload_test(serverconfig))
+    server, downloaduri, uploaduri = getserverdetails(config)   
+    displaysc(server)       
+    asyncio.run(upload_test(uploaduri))

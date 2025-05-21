@@ -13,7 +13,7 @@ config.read('config.ini')
 @functools.cache
 def discoverServerURLs() -> Optional[Dict]: 
     # Get URL from config
-    url = config.get('mlab', 'url')
+    url = config.get('mlab', 'discovery_url')
 
     try:
         response = requests.get(url)
