@@ -68,6 +68,8 @@ async def download_test(uri):
             subprotocols=[subprotocol],
             ssl=ssl_context
         )
+
+
         await on_open(websocket)
         await on_message(websocket)
 
